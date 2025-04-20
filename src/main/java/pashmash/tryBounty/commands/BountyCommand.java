@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import pashmash.tryBounty.TryBounty;
 import pashmash.tryBounty.hook.VaultHook;
 import pashmash.tryBounty.manager.BountyManager;
+import pashmash.tryBounty.menu.BountyMenu;
 import pashmash.tryBounty.util.ColorUtil;
 import pashmash.tryBounty.util.NumberUtil;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class BountyCommand implements CommandExecutor {
 
     private final BountyManager bountyManager;
+    private final BountyMenu bountyMenu = new BountyMenu();
 
     public BountyCommand(BountyManager bountyManager) {
         Objects.requireNonNull(TryBounty.getInstance().getCommand("bounty")).setExecutor(this);
@@ -28,8 +30,9 @@ public class BountyCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!(sender instanceof Player player)) return false;
+
         if (args.length < 3 || !args[0].equalsIgnoreCase("add")) {
-            player.sendMessage(ColorUtil.translate(ColorUtil.PREFIX + ColorUtil.RED + "Usage: /bounty add <player> <amount>"));
+            bountyMenu.openBountyMenu(player);
             return true;
         }
 
@@ -47,15 +50,14 @@ public class BountyCommand implements CommandExecutor {
             return true;
         }
 
-            if (!VaultHook.takeMoney(player, amount)) {
-                sender.sendMessage(ColorUtil.translate(ColorUtil.PREFIX + ColorUtil.RED + "You don't have enough money!"));
-                return true;
-            }
-
+        if (!VaultHook.has(player, amount)) {
+            sender.sendMessage(ColorUtil.translate(ColorUtil.PREFIX + ColorUtil.RED + "You don't have enough money!"));
+            return true;
+        }
 
         UUID targetUUID = target.getUniqueId();
-        int currentBounty = bountyManager.get(targetUUID); // Get the current bounty
-        int newBounty = currentBounty + (int) amount; // Add the new amount to the existing bounty
+        long currentBounty = bountyManager.get(targetUUID); // Use long for the current bounty
+        long newBounty = currentBounty + (long) amount; // Add the new amount to the existing bounty
         bountyManager.set(targetUUID, newBounty); // Update the bounty in the database
 
         sender.sendMessage(ColorUtil.translate(ColorUtil.PREFIX + ColorUtil.GREEN + "Added " + ColorUtil.BLUE + amount

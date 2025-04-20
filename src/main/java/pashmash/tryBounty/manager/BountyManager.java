@@ -10,14 +10,14 @@ import java.util.UUID;
 @Getter
 public class BountyManager {
 
-    private final HashMap<UUID, Integer> localStorage = new HashMap<>();
+    private final HashMap<UUID, Long> localStorage = new HashMap<>();
 
     public BountyManager() {
         ResultSet resultSet = TryBounty.getInstance().getSqlUtil().getResult("SELECT * FROM Bounty");
         try {
             while (resultSet.next()) {
                 UUID uuid = UUID.fromString(resultSet.getString("UUID"));
-                int amount = resultSet.getInt("amount");
+                long amount = resultSet.getLong("amount"); // Use getLong for consistency
                 localStorage.put(uuid, amount);
             }
         } catch (Exception ignored) { }
@@ -27,13 +27,13 @@ public class BountyManager {
         ResultSet resultSet = TryBounty.getInstance().getSqlUtil().getResult("SELECT * FROM Bounty WHERE UUID='" + uuid.toString() + "'");
         try {
             if (resultSet.next()) {
-                int amount = resultSet.getInt("amount");
+                long amount = resultSet.getLong("amount");
                 localStorage.put(uuid, amount);
             }
         } catch (Exception ignored) { }
     }
 
-    public void set(UUID uuid, int amount) {
+    public void set(UUID uuid, long amount) {
         TryBounty.getInstance().getSqlUtil().update("UPDATE Bounty SET amount=" + amount + " WHERE UUID='" + uuid.toString() + "'");
         localStorage.put(uuid, amount);
     }
@@ -43,12 +43,12 @@ public class BountyManager {
         localStorage.remove(uuid);
     }
 
-    public int get(UUID uuid) {
+    public long get(UUID uuid) {
         if (localStorage.containsKey(uuid)) {
             return localStorage.get(uuid);
         } else {
             String amountString = TryBounty.getInstance().getSqlUtil().get("Bounty", "amount", "UUID='" + uuid.toString() + "'");
-            int amount = amountString != null ? Integer.parseInt(amountString) : 0;
+            long amount = amountString != null ? Long.parseLong(amountString) : 0L;
             localStorage.put(uuid, amount);
             return amount;
         }

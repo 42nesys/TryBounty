@@ -2,5 +2,7 @@ name: TryBounty
 version: '1.0'
 main: pashmash.tryBounty.TryBounty
 api-version: '1.21'
+depend:
+  - Vault
 commands:
   bounty:
