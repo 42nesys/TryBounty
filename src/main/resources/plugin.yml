@@ -4,5 +4,8 @@ main: pashmash.tryBounty.TryBounty
 api-version: '1.21'
 depend:
   - Vault
+softdepend:
+  - EssentialsX
+  - TidyVanilla
 commands:
   bounty:

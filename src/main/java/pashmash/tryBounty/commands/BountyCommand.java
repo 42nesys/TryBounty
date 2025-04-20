@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import pashmash.tryBounty.TryBounty;
-import pashmash.tryBounty.hook.VaultHook;
+import pashmash.tryBounty.economy.VaultHook;
 import pashmash.tryBounty.manager.BountyManager;
 import pashmash.tryBounty.menu.BountyMenu;
 import pashmash.tryBounty.util.ColorUtil;
@@ -50,8 +50,8 @@ public class BountyCommand implements CommandExecutor {
             return true;
         }
 
-        if (!VaultHook.has(player, amount)) {
-            sender.sendMessage(ColorUtil.translate(ColorUtil.PREFIX + ColorUtil.RED + "You don't have enough money!"));
+        if (!VaultHook.takeMoney(player, amount)) {
+            sender.sendMessage(ColorUtil.translate(ColorUtil.PREFIX + TryBounty.getInstance().getConfig().getString("Messages.NotEnoughMoney")));
             return true;
         }
 
@@ -60,8 +60,9 @@ public class BountyCommand implements CommandExecutor {
         long newBounty = currentBounty + (long) amount; // Add the new amount to the existing bounty
         bountyManager.set(targetUUID, newBounty); // Update the bounty in the database
 
-        sender.sendMessage(ColorUtil.translate(ColorUtil.PREFIX + ColorUtil.GREEN + "Added " + ColorUtil.BLUE + amount
-                + ColorUtil.GREEN + " to " + ColorUtil.BLUE + target.getName() + ColorUtil.GREEN + "'s bounty!"));
+        sender.sendMessage(ColorUtil.translate(ColorUtil.PREFIX
+                + Objects.requireNonNull(TryBounty.getInstance().getConfig().getString("Messages.BountyAdded"))
+                .replace("%amount%", String.valueOf(amount)).replace("%player%", Objects.requireNonNull(target.getName()))));
         return true;
     }
 }

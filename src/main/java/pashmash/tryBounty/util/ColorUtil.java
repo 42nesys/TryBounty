@@ -2,6 +2,7 @@ package pashmash.tryBounty.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import pashmash.tryBounty.TryBounty;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,7 +12,7 @@ public class ColorUtil {
     public static final String BLUE = "&#559eff";
     public static final String GREEN = "&#7cfc00";
     public static final String RED = "&#ff0000";
-    public static final String PREFIX = "§8▏ " + BLUE + "TrySmp §8» §7";
+    public static final String PREFIX = TryBounty.getInstance().getConfig().getString("Settings.Prefix");
 
     public static Component translate(String message) {
         message = message.replaceAll("&([0-9a-fk-or])", "§$1");

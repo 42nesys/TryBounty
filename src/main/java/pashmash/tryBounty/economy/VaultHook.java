@@ -1,4 +1,4 @@
-package pashmash.tryBounty.hook;
+package pashmash.tryBounty.economy;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -17,12 +17,12 @@ public class VaultHook {
         this.plugin = plugin;
     }
 
-    public static boolean setupEconomy() {
+    public boolean setupEconomy() {
         if (Bukkit.getPluginManager().getPlugin("Vault") == null) return false;
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
         if (rsp == null) return false;
         economy = rsp.getProvider();
-        return false;
+        return true;
     }
 
     public static boolean addMoney(OfflinePlayer player, double amount) {

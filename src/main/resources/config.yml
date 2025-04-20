@@ -3,4 +3,9 @@ Sql:
   Port: "3306"
   Database: "s10_daddy"
   Username: "u10_IuGNoCN709"
-  Password: "PNy8KjiCLQ5U+JL@B+qRyyV."
+  Password: "DU HUAN"
+Settings:
+  Prefix: "§8▏&#559effTrySmp §8» §7"
+Messages:
+  BountyAdded: "Added bounty of %amount% to %player%"
+  NotEnoughMoney: "Not enough money"

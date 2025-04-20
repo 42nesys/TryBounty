@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import pashmash.tryBounty.commands.BountyCommand;
-import pashmash.tryBounty.hook.VaultHook;
+import pashmash.tryBounty.economy.VaultHook;
 import pashmash.tryBounty.listener.PlayerJoinListener;
 import pashmash.tryBounty.manager.BountyManager;
 import pashmash.tryBounty.util.SqlUtil;
@@ -38,10 +38,10 @@ public final class TryBounty extends JavaPlugin {
                 ");");
 
         vaultHook = new VaultHook(instance);
-
-        // Initialize VaultHook
-        if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
-            VaultHook.setupEconomy();
+        if (!vaultHook.setupEconomy()) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            getLogger().severe("Vault is not available! Disabling plugin.");
+            return;
         }
 
         // Initialize BountyManager
