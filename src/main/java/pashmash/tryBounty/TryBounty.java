@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import pashmash.tryBounty.commands.BountyCommand;
 import pashmash.tryBounty.economy.VaultHook;
+import pashmash.tryBounty.listener.PlayerDeathListener;
 import pashmash.tryBounty.listener.PlayerJoinListener;
 import pashmash.tryBounty.manager.BountyManager;
 import pashmash.tryBounty.util.SqlUtil;
@@ -24,7 +25,6 @@ public final class TryBounty extends JavaPlugin {
         saveDefaultConfig();
         instance = this;
 
-        // Initialize SqlUtil
         sqlUtil = new SqlUtil(
                 getConfig().getString("Sql.Host"),
                 getConfig().getString("Sql.Port"),
@@ -44,16 +44,11 @@ public final class TryBounty extends JavaPlugin {
             return;
         }
 
-        // Initialize BountyManager
         bountyManager = new BountyManager();
 
-        // Register commands and listeners
         new BountyCommand(bountyManager);
         new PlayerJoinListener();
+        new PlayerDeathListener();
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
 }

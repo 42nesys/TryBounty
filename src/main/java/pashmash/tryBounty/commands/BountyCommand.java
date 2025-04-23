@@ -56,9 +56,9 @@ public class BountyCommand implements CommandExecutor {
         }
 
         UUID targetUUID = target.getUniqueId();
-        long currentBounty = bountyManager.get(targetUUID); // Use long for the current bounty
-        long newBounty = currentBounty + (long) amount; // Add the new amount to the existing bounty
-        bountyManager.set(targetUUID, newBounty); // Update the bounty in the database
+        long currentBounty = bountyManager.get(targetUUID);
+        long newBounty = currentBounty + (long) amount;
+        bountyManager.set(targetUUID, newBounty);
 
         sender.sendMessage(ColorUtil.translate(ColorUtil.PREFIX
                 + Objects.requireNonNull(TryBounty.getInstance().getConfig().getString("Messages.BountyAdded"))

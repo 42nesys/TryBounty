@@ -31,14 +31,7 @@ public class SqlUtil {
         return connection != null;
     }
 
-    public void update(String query) {
-        if (isConnected()) {
-            try {
-                connection.createStatement().executeUpdate(query);
-            } catch (SQLException ignored) { }
-        }
-    }
-    public void execute(String query, Object... params) {
+    public void update(String query, Object... params) {
         if (!isConnected()) return;
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -51,34 +44,30 @@ public class SqlUtil {
         }
     }
 
-    public ResultSet getResult(String query) {
-        if (isConnected()) {
-            try {
-                return connection.createStatement().executeQuery(query);
-            } catch (SQLException ignored) { }
-        }
+    public ResultSet getResult(String query, Object... params) {
+        if (!isConnected()) return null;
 
-        return null;
-    }
-
-    public String get(String database, String value) {
-        return get(database, value, "");
-    }
-
-    public String get(String database, String value, String where) {
-        if (isConnected()) {
-            ResultSet resultSet = getResult("SELECT " + value + " FROM " + database + (where == null || where.equalsIgnoreCase("") ? "" : " WHERE " + where));
-
-            if (resultSet != null) {
-                try {
-                    if (resultSet.next()) {
-                        return resultSet.getString(value);
-                    }
-                } catch (SQLException ignored) { }
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            for (int i = 0; i < params.length; i++) {
+                stmt.setObject(i + 1, params[i]);
             }
+            return stmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
+    }
 
+    public String get(String database, String value, String where, Object... params) {
+        if (!isConnected()) return "";
+
+        String query = "SELECT " + value + " FROM " + database + (where == null || where.isEmpty() ? "" : " WHERE " + where);
+        try (ResultSet resultSet = getResult(query, params)) {
+            if (resultSet != null && resultSet.next()) {
+                return resultSet.getString(value);
+            }
+        } catch (SQLException ignored) { }
         return "";
     }
-
 }

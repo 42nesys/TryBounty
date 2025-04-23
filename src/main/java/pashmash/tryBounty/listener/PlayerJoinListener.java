@@ -18,13 +18,17 @@ public class PlayerJoinListener implements Listener {
 
         Bukkit.getScheduler().runTaskAsynchronously(TryBounty.getInstance(), () -> {
             String uuid = player.getUniqueId().toString();
-            String existingUUID = TryBounty.getInstance().getSqlUtil().get("Bounty", "UUID", "UUID='" + uuid + "'");
+            try {
+                String existingUUID = TryBounty.getInstance().getSqlUtil().get("Bounty", "UUID", "UUID=?", uuid);
 
-            if (existingUUID == null || !existingUUID.equalsIgnoreCase(uuid)) {
-                TryBounty.getInstance().getSqlUtil().update("INSERT INTO Bounty (UUID, amount) VALUES ('" + uuid + "', 0)");
+                if (existingUUID == null || !existingUUID.equalsIgnoreCase(uuid)) {
+                    TryBounty.getInstance().getSqlUtil().update("INSERT INTO Bounty (UUID, amount) VALUES (?, ?)", uuid, 0);
+                }
+
+                TryBounty.getInstance().getBountyManager().loadLocal(player.getUniqueId());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            TryBounty.getInstance().getBountyManager().loadLocal(player.getUniqueId());
         });
     }
 }

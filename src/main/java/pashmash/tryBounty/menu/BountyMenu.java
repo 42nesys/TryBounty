@@ -15,11 +15,9 @@ import pashmash.tryBounty.util.ColorUtil;
 import pashmash.tryBounty.util.NumberUtil;
 import pashmash.tryBounty.util.SkullCreator;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BountyMenu {
 
@@ -43,18 +41,22 @@ public class BountyMenu {
                     .asGuiItem());
         }
 
-        // Get the instance of BountyManager
         BountyManager bountyManager = TryBounty.getInstance().getBountyManager();
 
-        // Get bounties for all online players and sort by bounty amount
-        List<Map.Entry<UUID, @NotNull Long>> sortedBounties = Bukkit.getOnlinePlayers().stream()
-                .map(Player::getUniqueId)
-                .collect(Collectors.toMap(uuid -> uuid, bountyManager::get))
+        List<Map.Entry<UUID, @NotNull Long>> sortedBounties = Stream.concat(
+                        Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId),
+                        Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getUniqueId)
+
+                ).distinct()
+                .collect(Collectors.toMap(
+                        uuid -> uuid,
+                        bountyManager::get
+                ))
                 .entrySet().stream()
+                .filter(entry -> entry.getValue() > 0)
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .toList();
 
-        // Add player heads to the GUI
         for (Map.Entry<UUID, Long> entry : sortedBounties) {
             UUID uuid = entry.getKey();
             String formattedBounty = NumberUtil.formatSuffixed(entry.getValue());
@@ -65,11 +67,9 @@ public class BountyMenu {
             gui.addItem(ItemBuilder.from(playerHead)
                     .name(ColorUtil.translate(ColorUtil.BLUE + target.getName()))
                     .lore(List.of(
-                            ColorUtil.translate("&7Bounty: " + ColorUtil.GREEN + formattedBounty) // Use formatted value
+                            ColorUtil.translate("&7Bounty: " + ColorUtil.GREEN + formattedBounty)
                     ))
-                    .asGuiItem(event -> {
-                        event.setCancelled(true);
-                    }));
+                    .asGuiItem(event -> event.setCancelled(true)));
         }
         gui.setDefaultClickAction(event -> event.setCancelled(true));
         gui.open(player);
